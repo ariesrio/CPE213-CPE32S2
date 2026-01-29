@@ -1,0 +1,9 @@
+---
+- name: Automated defense baseline (firewall + IPS)
+  hosts: web_servers
+  become: yes
+
+  roles:
+    - firewall_defense
+    - fail2ban_ssh
+

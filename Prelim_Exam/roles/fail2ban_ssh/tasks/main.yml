@@ -1,0 +1,33 @@
+---
+- name: Install Fail2Ban
+  apt:
+    name: fail2ban
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Ensure Fail2Ban service is enabled and running
+  service:
+    name: fail2ban
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Configure SSH jail for IPS behavior
+  copy:
+    dest: /etc/fail2ban/jail.d/ssh.conf
+    content: |
+      [sshd]
+      enabled  = true
+      port     = ssh
+      logpath  = /var/log/auth.log
+      backend  = systemd
+      maxretry = {{ fail2ban_maxretry }}
+      bantime  = {{ fail2ban_bantime }}
+      findtime = {{ fail2ban_findtime }}
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart fail2ban
+  become: yes
+

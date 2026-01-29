@@ -1,0 +1,34 @@
+# tasks file for roles/firewall_defense
+
+- name: Install UFW
+  apt:
+    name: ufw
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Set default policy to deny all incoming
+  ufw:
+    direction: incoming
+    policy: deny
+  become: yes
+
+- name: Set default policy to allow outgoing
+  ufw:
+    direction: outgoing
+    policy: allow
+  become: yes
+
+- name: Allow required TCP services with rate limiting
+  ufw:
+    rule: limit
+    port: "{{ item }}"
+    proto: tcp
+  loop: "{{ allowed_ports }}"
+  become: yes
+
+- name: Enable UFW
+  ufw:
+    state: enabled
+  become: yes
+
